@@ -129,5 +129,13 @@
     <footer>
         <p>&copy; 2025 Your Company. All rights reserved.</p>
     </footer>
+    <script>
+        const username = localStorage.getItem("username");
+    
+        if (!username || username !== 'sangram') {
+            alert("You are not authorized to access this page. Redirecting to login page...");
+            window.location.href = "/";
+        }
+    </script>
 </body>
 </html>

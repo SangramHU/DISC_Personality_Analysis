@@ -62,7 +62,12 @@ app.post('/login', (req, res) => {
 
     // Check for admin credentials
     if (username === 'sangram' && password === 'sangram') {
-        return res.redirect('/admin');
+        return res.send(`
+            <script>
+                localStorage.setItem('username', '${username}');
+                window.location.href = '/admin';
+            </script>
+        `);
     }
 
     // Check for regular user credentials
@@ -70,7 +75,12 @@ app.post('/login', (req, res) => {
         if (err) {
             res.status(500).send('Server error');
         } else if (row) {
-            res.redirect('/dashboard');
+            res.send(`
+                <script>
+                    localStorage.setItem('username', '${username}');
+                    window.location.href = '/dashboard';
+                </script>
+            `);
         } else {
             // Render the login page with an error message
             res.send(`
@@ -211,7 +221,6 @@ app.get('/list-questions', (req, res) => {
     res.sendFile(path.join(__dirname, 'Admin_Management', 'list_questions.html'));
 });
 
-// API to fetch all questions
 app.get('/api/questions', (req, res) => {
     db.all('SELECT * FROM questions', (err, rows) => {
         if (err) {
@@ -249,12 +258,10 @@ app.get('/api/personality_test/questions', (req, res) => {
 app.post('/api/personality_test/submit', (req, res) => {
     const { username, answers } = req.body;
 
-    // Ensure answers are provided
     if (!answers || Object.keys(answers).length === 0) {
         return res.status(400).json({ error: 'No answers provided' });
     }
 
-    // Count the number of responses for each category
     const totalQuestions = Object.keys(answers).length;
     const categoryCounts = {
         dominance: 0,
@@ -263,23 +270,19 @@ app.post('/api/personality_test/submit', (req, res) => {
         conscientiousness: 0,
     };
 
-    // Count responses for each category
     Object.values(answers).forEach((response) => {
         if (categoryCounts[response] !== undefined) {
             categoryCounts[response]++;
         }
     });
 
-    // Calculate percentages for each category
     const dominancePercentage = Math.round((categoryCounts.dominance / totalQuestions) * 100);
     const influencePercentage = Math.round((categoryCounts.influence / totalQuestions) * 100);
     const steadinessPercentage = Math.round((categoryCounts.steadiness / totalQuestions) * 100);
     const conscientiousnessPercentage = Math.round((categoryCounts.conscientiousness / totalQuestions) * 100);
 
-    // Format the score as aDbIcSdC
     const formattedScore = `${dominancePercentage}D${influencePercentage}I${steadinessPercentage}S${conscientiousnessPercentage}C`;
 
-    // Update the database with the calculated score
     db.run(
         `INSERT INTO personality_test_progress (username, progress, score)
          VALUES (?, NULL, ?)

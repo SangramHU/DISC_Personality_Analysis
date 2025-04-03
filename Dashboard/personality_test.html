@@ -88,6 +88,7 @@
     </header>
     <main>
         <h1>Take the Personality Test</h1>
+        <p>Logged in as: <span id="logged-in-username">Loading...</span></p> <!-- Display Logged-in Username -->
         <form id="test-form">
             <div id="questions-container">
                 <!-- Questions will be dynamically populated here -->
@@ -99,13 +100,15 @@
         <p>&copy; 2025 Your Company. All rights reserved.</p>
     </footer>
     <script>
-        // Retrieve the logged-in username dynamically
-        const username = localStorage.getItem("username"); // Assuming the username is stored in localStorage during login
+        const username = localStorage.getItem("username");
 
         if (!username) {
             alert("You are not logged in. Redirecting to login page...");
             window.location.href = "/";
         }
+
+        // Display the logged-in username
+        document.getElementById('logged-in-username').textContent = username;
 
         const apiUrl = "/api/personality_test";
 

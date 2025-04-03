@@ -91,11 +91,11 @@
     </header>
     <main>
         <h1>Welcome to the Dashboard!</h1>
-        <p>You have successfully logged in.</p>
+        <p>Logged in as: <span id="logged-in-username">Loading...</span></p> <!-- Display Logged-in Username -->
         <p>Your Score: <span id="user-score">Loading...</span></p> <!-- Display User Score -->
         <div class="tile-container">
             <a href="/Dashboard/personality_test.html" class="btn">Take Personality Test</a>
-            <a href="/" class="btn">Logout</a>
+            <a href="/" class="btn" onclick="localStorage.clear();">Logout</a>
         </div>
     </main>
     <footer>
@@ -103,8 +103,17 @@
     </footer>
 
     <script>
+        const username = localStorage.getItem("username");
+
+        if (!username) {
+            alert("You are not logged in. Redirecting to login page...");
+            window.location.href = "/";
+        }
+
+        // Display the logged-in username
+        document.getElementById('logged-in-username').textContent = username;
+
         // Fetch the logged-in user's score
-        const username = "current_user"; // Replace with the actual logged-in username
         fetch(`/api/personality_test/score?username=${username}`)
             .then(response => response.json())
             .then(data => {

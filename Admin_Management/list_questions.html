@@ -211,6 +211,25 @@
         <p>&copy; 2025 Your Company. All rights reserved.</p>
     </footer>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to delete this question?</p>
+            <div class="modal-buttons">
+                <button id="confirm-delete" class="btn">Yes</button>
+                <button id="cancel-delete" class="btn">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <p>Question deleted successfully!</p>
+            <button id="close-success-modal" class="btn">Close</button>
+        </div>
+    </div>
+
     <script>
         let questionToDelete = null;
 
