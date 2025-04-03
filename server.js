@@ -311,71 +311,161 @@ app.get('/api/personality_test/score', (req, res) => {
     });
 });
 
-// API to handle chat queries
-app.post('/api/chat', (req, res) => {
-    const { username, query } = req.body;
+// // API to handle chat queries
+// app.post('/api/chat', (req, res) => {
+//     const { username, query } = req.body;
 
-    if (!username || !query) {
-        return res.status(400).json({ error: 'Username and query are required' });
+//     if (!username || !query) {
+//         return res.status(400).json({ error: 'Username and query are required' });
+//     }
+
+//     // Fetch the user's DISC score from the database
+//     db.get(
+//         `SELECT score FROM personality_test_progress WHERE username = ?`,
+//         [username],
+//         (err, row) => {
+//             if (err) {
+//                 console.error('Error fetching DISC score:', err);
+//                 return res.status(500).json({ error: 'Failed to fetch DISC score' });
+//             }
+
+//             if (!row || !row.score) {
+//                 return res.status(404).json({ error: 'DISC score not found for the user' });
+//             }
+
+//             const DISC_SCORE = row.score;
+
+//             // Format the prompt for the Gemini AI model
+//             const prompt = `
+//                 You are an expert behavioral AI utilizing DISC personality analysis. The user has provided their DISC profile score in the format aDbIcSdC, where:
+
+//                 'a%' represents Dominance (D)
+//                 'b%' represents Influence (I)
+//                 'c%' represents Steadiness (S)
+//                 'd%' represents Conscientiousness (C)
+
+//                 Interpret the user’s DISC score to understand their behavioral tendencies, communication style, and decision-making approach. Then, answer their query in a way that aligns with their DISC profile, ensuring clarity, relevance, and personalization.
+
+//                 User's DISC Score: ${DISC_SCORE}
+//                 User's Query: ${query}
+
+//                 Provide a detailed and insightful response tailored to the user’s DISC profile.
+//             `;
+
+//             // Call the Gemini AI model (replace with actual API call)
+//             callGeminiAI(prompt)
+//                 .then(response => {
+//                     res.json({ reply: response });
+//                 })
+//                 .catch(error => {
+//                     console.error('Error calling Gemini AI:', error);
+//                     res.status(500).json({ error: 'Failed to process the query' });
+//                 });
+//         }
+//     );
+// });
+
+// const axios = require('axios'); // Import axios for HTTP requests
+// require('dotenv').config(); // Load environment variables from a .env file
+
+// async function callGeminiAI(prompt) {
+//     console.log('Preparing to call Gemini AI with the following prompt:');
+//     console.log(prompt); // Log the prompt being sent to the Gemini API
+
+//     try {
+//         const response = await axios.post(
+//             process.env.GEMINI_API_URL, // Gemini API URL from environment variables
+//             {
+//                 prompt: prompt, // The prompt to send to the Gemini API
+//                 max_tokens: 500, // Adjust the token limit as needed
+//                 temperature: 0.7, // Adjust the temperature for response creativity
+//             },
+//             {
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                     Authorization: `Bearer ${process.env.GEMINI_API_KEY}`, // API key from environment variables
+//                 },
+//             }
+//         );
+
+//         // Log the response from the Gemini API
+//         console.log('Response received from Gemini AI:');
+//         console.log(response.data);
+
+//         // Return the AI's response
+//         return response.data.choices[0].text.trim();
+//     } catch (error) {
+//         // Log the error details
+//         console.error('Error occurred while calling Gemini AI:');
+//         if (error.response) {
+//             console.error('Status Code:', error.response.status);
+//             console.error('Response Data:', error.response.data);
+//         } else {
+//             console.error('Error Message:', error.message);
+//         }
+
+//         // Throw an error to be handled by the caller
+//         throw new Error('Failed to process the query with Gemini AI');
+//     }
+// }
+
+
+require('dotenv').config();  // Load environment variables
+const { GoogleGenerativeAI } = require("@google/generative-ai"); // Import the Google Gemini AI SDK
+app.use(bodyParser.json());
+const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY); // Use API Key from .env
+
+// Function to call Gemini AI
+async function callGeminiAI(prompt) {
+    console.log("Calling Gemini AI with prompt:");
+    console.log(prompt);
+
+    try {
+        const model = gemini.getGenerativeModel({ model: "gemini-1.5-flash" }); // Use a valid model
+        const result = await model.generateContent(prompt);
+        const response = result.response;
+        const text = response.text();
+
+        console.log("Response from Gemini AI:", text);
+        return text;
+    } catch (error) {
+        console.error("Error occurred while calling Gemini AI:", error);
+        throw new Error("Failed to process the query with Gemini AI");
     }
-
-    // Fetch the user's DISC score from the database
-    db.get(
-        `SELECT score FROM personality_test_progress WHERE username = ?`,
-        [username],
-        (err, row) => {
-            if (err) {
-                console.error('Error fetching DISC score:', err);
-                return res.status(500).json({ error: 'Failed to fetch DISC score' });
-            }
-
-            if (!row || !row.score) {
-                return res.status(404).json({ error: 'DISC score not found for the user' });
-            }
-
-            const DISC_SCORE = row.score;
-
-            // Format the prompt for the Gemini AI model
-            const prompt = `
-                You are an expert behavioral AI utilizing DISC personality analysis. The user has provided their DISC profile score in the format aDbIcSdC, where:
-
-                'a%' represents Dominance (D)
-                'b%' represents Influence (I)
-                'c%' represents Steadiness (S)
-                'd%' represents Conscientiousness (C)
-
-                Interpret the user’s DISC score to understand their behavioral tendencies, communication style, and decision-making approach. Then, answer their query in a way that aligns with their DISC profile, ensuring clarity, relevance, and personalization.
-
-                User's DISC Score: ${DISC_SCORE}
-                User's Query: ${query}
-
-                Provide a detailed and insightful response tailored to the user’s DISC profile.
-            `;
-
-            // Call the Gemini AI model (replace with actual API call)
-            callGeminiAI(prompt)
-                .then(response => {
-                    res.json({ reply: response });
-                })
-                .catch(error => {
-                    console.error('Error calling Gemini AI:', error);
-                    res.status(500).json({ error: 'Failed to process the query' });
-                });
-        }
-    );
-});
-
-// Mock function to simulate Gemini AI API call
-function callGeminiAI(prompt) {
-    return new Promise((resolve) => {
-        // Simulate AI response
-        setTimeout(() => {
-            resolve(`This is a simulated response based on the prompt: ${prompt}`);
-        }, 1000);
-    });
 }
 
+// API endpoint to process chat queries
+app.post("/api/chat", async (req, res) => {
+    const { username, query, discScore } = req.body; // Accept discScore from the request body
+
+    if (!username || !query || !discScore) {
+        return res.status(400).json({ error: "Username, query, and DISC score are required" });
+    }
+
+    const prompt = `
+        You are an expert behavioral AI using DISC personality analysis. The user has provided their DISC profile score:
+
+        'D' = Dominance: ${discScore.split('D')[0]}%
+        'I' = Influence: ${discScore.split('D')[1].split('I')[0]}%
+        'S' = Steadiness: ${discScore.split('I')[1].split('S')[0]}%
+        'C' = Conscientiousness: ${discScore.split('S')[1].split('C')[0]}%
+
+        User's Query: ${query}
+
+        Provide a response tailored to their DISC profile. Do not mention or discuss the DISC score in the response.
+    `;
+
+    try {
+        const response = await callGeminiAI(prompt);
+        res.json({ reply: response });
+    } catch (error) {
+        console.error("Error occurred while processing the chat query:", error);
+        res.status(500).json({ error: "Failed to generate response" });
+    }
+});
+
 // Start the server
-app.listen(80, () => {
-    console.log('Server is running on http://localhost:80');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
