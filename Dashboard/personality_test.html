@@ -34,11 +34,11 @@
         }
 
         .breadcrumb {
-            max-width: 1100px;
-            margin: 20px auto 0;
-            padding: 0 30px;
+            width: 100%; /* Make breadcrumb span the full width */
+            padding: 10px 20px;
             font-size: 0.9rem;
-            text-align: left;
+            text-align: left; /* Align text to the left */
+            background-color: #f8f9fa;
         }
 
         .breadcrumb a {
@@ -49,6 +49,23 @@
 
         .breadcrumb a:hover {
             text-decoration: underline;
+        }
+
+        .logout-btn-header {
+            margin-left: auto;
+            padding: 8px 16px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn-header:hover {
+            background-color: #c82333;
+            text-decoration: none;
         }
 
         .question {
@@ -142,8 +159,8 @@
 <body>
     <header class="header">
         <nav class="navbar">
-            <div class="logo">Personality Test</div>
-            <a href="/" class="logout-btn-header" onclick="localStorage.clear();">Logout</a>
+            <div class="logo">DISC Personality Analysis</div>
+            <button class="logout-btn-header" onclick="localStorage.clear(); window.location.href = '/';">Logout</button>
         </nav>
     </header>
 

@@ -4,52 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Question</title>
+    <link rel="stylesheet" href="../Style/admin_style.css">
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #eef1f7;
-            color: #333;
-        }
-
-        /* Header Styling */
-        header {
-            background-color: #2C3E50;
-            color: white;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .page-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-
-        .logout-btn {
-            background-color: #E74C3C;
-            color: white;
-            padding: 8px 15px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border-radius: 5px;
-            transition: 0.3s;
-        }
-
-        .logout-btn:hover {
-            background-color: #C0392B;
-        }
-
-        /* Breadcrumb Styling */
+        /* Additional styles for breadcrumb alignment */
         .breadcrumb {
-            margin: 20px 40px;
+            width: 100%; /* Make breadcrumb span the full width */
+            padding: 10px 20px;
             font-size: 0.9rem;
+            text-align: left; /* Align text to the left */
+            background-color: #f8f9fa;
         }
 
         .breadcrumb a {
-            color: #2C3E50;
+            color: #008080;
             text-decoration: none;
             font-weight: bold;
         }
@@ -57,93 +24,56 @@
         .breadcrumb a:hover {
             text-decoration: underline;
         }
-
-        /* Form Styling */
-        .form-container {
-            max-width: 600px;
-            margin: 20px auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-container h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #2C3E50;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            background-color: #2C3E50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            width: 100%;
-        }
-
-        button:hover {
-            background-color: #1A252F;
-        }
-
-        /* Footer Styling */
-        footer {
-            background-color: #2C3E50;
-            color: white;
-            text-align: center;
-            padding: 15px 0;
-            margin-top: 40px;
-        }
     </style>
 </head>
 <body>
-    <header>
-        <div class="page-title">Add Question</div>
-        <a href="/" class="logout-btn">Logout</a>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">Add Question</div>
+            <a href="/" class="logout-btn" onclick="localStorage.clear();">Logout</a>
+        </nav>
     </header>
+
     <div class="breadcrumb">
         <a href="/admin">Admin Dashboard</a> > <a href="/add-question">Add Question</a>
     </div>
-    <div class="form-container">
-        <h1>Add a New Question</h1>
-        <form action="/add-question" method="POST">
-            <label for="question">Question:</label>
-            <textarea id="question" name="question" rows="3" required></textarea>
 
-            <label for="dominance">Option (Dominance):</label>
-            <input type="text" id="dominance" name="dominance" required>
+    <main>
+        <div class="form-container">
+            <h1>Add a New Question</h1>
+            <form action="/add-question" method="POST">
+                <div class="form-group">
+                    <label for="question">Question:</label>
+                    <textarea id="question" name="question" rows="3" required></textarea>
+                </div>
 
-            <label for="influence">Option (Influence):</label>
-            <input type="text" id="influence" name="influence" required>
+                <div class="form-group">
+                    <label for="dominance">Option (Dominance):</label>
+                    <input type="text" id="dominance" name="dominance" required>
+                </div>
 
-            <label for="steadiness">Option (Steadiness):</label>
-            <input type="text" id="steadiness" name="steadiness" required>
+                <div class="form-group">
+                    <label for="influence">Option (Influence):</label>
+                    <input type="text" id="influence" name="influence" required>
+                </div>
 
-            <label for="conscientiousness">Option (Conscientiousness):</label>
-            <input type="text" id="conscientiousness" name="conscientiousness" required>
+                <div class="form-group">
+                    <label for="steadiness">Option (Steadiness):</label>
+                    <input type="text" id="steadiness" name="steadiness" required>
+                </div>
 
-            <button type="submit">Submit</button>
-        </form>
-    </div>
-    <footer>
-        <p>&copy; 2025 Your Company. All rights reserved.</p>
+                <div class="form-group">
+                    <label for="conscientiousness">Option (Conscientiousness):</label>
+                    <input type="text" id="conscientiousness" name="conscientiousness" required>
+                </div>
+
+                <button type="submit" class="btn">Submit Question</button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 DISC Personality. All rights reserved.</p>
     </footer>
 </body>
 </html>

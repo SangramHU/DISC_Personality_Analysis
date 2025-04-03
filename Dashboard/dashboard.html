@@ -4,123 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="../Style/style.css"> 
+    <link rel="stylesheet" href="../Style/style.css">
     <style>
-        /* Additional styles specific to dashboard if needed, or overrides */
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh; /* Ensure footer stays at bottom */
-        }
-        
-        main {
-            flex: 1; /* Allow main content to grow */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px; /* Add padding */
-            text-align: center;
-        }
-
-        /* Use existing .container class for consistent padding/width */
+        /* Center and style the dashboard content */
         .dashboard-content {
-             max-width: 1100px; /* Match container width */
-             margin: 20px auto; /* Center content */
-             padding: 30px;
-             background: #ffffff; /* White background like index forms */
-             border-radius: 8px;
-             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Match container shadow */
+            text-align: center;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .breadcrumb {
-            max-width: 1100px; /* Align with container */
-            margin: 20px auto 0; /* Adjust margin */
-            padding: 0 30px; /* Align with container padding */
-            font-size: 0.9rem;
-            text-align: left;
+        .dashboard-content h1 {
+            font-size: 2.5rem;
+            color: #2C3E50;
+            margin-bottom: 20px;
         }
 
-        .breadcrumb a {
-            color: #008080; /* Use theme color */
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .breadcrumb a:hover {
-            text-decoration: underline;
+        .dashboard-content p {
+            font-size: 1.2rem;
+            color: #34495E;
+            margin-bottom: 20px;
         }
 
         .tile-container {
-            display: flex;
-            flex-wrap: wrap; /* Allow wrapping */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            justify-content: center; /* Center tiles */
             margin-top: 30px;
         }
 
-        /* Ensure .btn styles from style.css apply correctly */
-        .tile-container .btn {
-             min-width: 200px; /* Give buttons minimum width */
-             text-decoration: none; /* Remove underline from links styled as buttons */
+        .tile {
+            background-color: #008080;
+            padding: 30px 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
         }
-        
+
+        .tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background-color: #006666;
+            text-decoration: none;
+        }
+
+        .tile.disabled {
+            background-color: #cccccc;
+            color: #666666;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        /* Logout button styling */
         .logout-btn-header {
-             background-color: #E74C3C; /* Specific logout button color */
-             color: white;
-             padding: 8px 15px;
-             text-decoration: none;
-             font-size: 0.9rem;
-             border-radius: 5px;
-             transition: background-color 0.3s;
+            margin-left: auto;
+            padding: 8px 16px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
         }
 
         .logout-btn-header:hover {
-             background-color: #C0392B;
-             text-decoration: none; /* Keep underline off on hover */
+            background-color: #c82333;
+            text-decoration: none;
         }
-
-        /* Adjust header padding if needed */
-         .header .navbar {
-            padding: 1rem 2rem; /* Match index.html */
-         }
-         .header .logo {
-             font-size: 1.5rem; /* Match index.html */
-             font-weight: bold;
-         }
-
-         /* Adjust footer styles if needed (should inherit from style.css) */
-
     </style>
 </head>
 <body>
     <header class="header">
         <nav class="navbar">
-            <div class="logo">Dashboard</div> 
-            <a href="/" class="logout-btn-header" onclick="localStorage.clear();">Logout</a>
+            <div class="logo">DISC Personality Analysis</div>
+            <button class="logout-btn-header" onclick="localStorage.clear(); window.location.href = '/';">Logout</button>
         </nav>
     </header>
 
-    <div class="breadcrumb">
-        <a href="/Dashboard/dashboard.html">Dashboard</a>
-    </div>
-
     <main>
-        <div class="dashboard-content"> 
+        <div class="dashboard-content">
             <h1>Welcome to the Dashboard!</h1>
-            <p>Logged in as: <span id="logged-in-username">Loading...</span></p> 
-            <p>Your Score: <span id="user-score">Loading...</span></p> 
-            
+            <p>Logged in as: <span id="logged-in-username">Loading...</span></p>
+            <p>Your Score: <span id="user-score">Loading...</span></p>
+
             <div class="tile-container">
-                <a href="/Dashboard/personality_test.html" class="btn">Take Personality Test</a>
-                <a href="/Dashboard/chatbox.html" class="btn">Personal AI Assistance</a> 
-                <a href="/" class="btn btn-secondary" onclick="localStorage.clear();">Logout</a> 
+                <a href="/Dashboard/personality_test.html" class="tile">Take Personality Test</a>
+                <a href="/Dashboard/chatbox.html" class="tile">Personal AI Assistance</a>
+                <div class="tile disabled">Saved Chats</div>
+                <div class="tile disabled">Profile</div>
+                <div class="tile disabled">Know More</div>
+                <div class="tile disabled">Social</div>
             </div>
         </div>
     </main>
 
     <footer class="footer">
-        <p>Contact us at <a href="mailto:info@discpersonality.com">info@discpersonality.com</a></p> <p>&copy; 2025 DISC Personality. All rights reserved.</p> </footer>
+        <p>Contact us at <a href="mailto:info@discpersonality.com">info@discpersonality.com</a></p>
+        <p>&copy; 2025 DISC Personality. All rights reserved.</p>
+    </footer>
 
     <script>
         // Check if the user is logged in
@@ -130,22 +124,22 @@
             alert("You are not logged in. Redirecting to login page...");
             window.location.href = "/";
         } else {
-             // Display the logged-in username
-             document.getElementById('logged-in-username').textContent = username;
+            // Display the logged-in username
+            document.getElementById('logged-in-username').textContent = username;
 
-             // Fetch the logged-in user's score
-             fetch(`/api/personality_test/score?username=${username}`)
-                 .then(response => {
-                      if (!response.ok) { throw new Error('Network response was not ok'); }
-                      return response.json();
-                 })
-                 .then(data => {
-                     document.getElementById('user-score').textContent = data.score || 'No Score';
-                 })
-                 .catch((error) => {
-                     console.error('Error fetching score:', error);
-                     document.getElementById('user-score').textContent = "Error fetching score";
-                 });
+            // Fetch the logged-in user's score
+            fetch(`/api/personality_test/score?username=${username}`)
+                .then(response => {
+                    if (!response.ok) { throw new Error('Network response was not ok'); }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('user-score').textContent = data.score || 'No Score';
+                })
+                .catch((error) => {
+                    console.error('Error fetching score:', error);
+                    document.getElementById('user-score').textContent = "Error fetching score";
+                });
         }
     </script>
 </body>

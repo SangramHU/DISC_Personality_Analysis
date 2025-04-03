@@ -4,58 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>List Users</title>
+    <link rel="stylesheet" href="../Style/admin_style.css">
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #eef1f7;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        /* Header Styling */
-        header {
-            background-color: #2C3E50;
-            color: white;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .page-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-
-        .logout-btn {
-            background-color: #E74C3C;
-            color: white;
-            padding: 8px 15px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border-radius: 5px;
-            transition: 0.3s;
-        }
-
-        .logout-btn:hover {
-            background-color: #C0392B;
-        }
-
-        /* Breadcrumb Styling */
+        /* Additional styles for breadcrumb alignment */
         .breadcrumb {
-            margin: 20px 40px;
+            width: 100%; /* Make breadcrumb span the full width */
+            padding: 10px 20px;
             font-size: 0.9rem;
+            text-align: left; /* Align text to the left */
+            background-color: #f8f9fa;
         }
 
         .breadcrumb a {
-            color: #2C3E50;
+            color: #008080;
             text-decoration: none;
             font-weight: bold;
         }
@@ -63,88 +24,22 @@
         .breadcrumb a:hover {
             text-decoration: underline;
         }
-
-        /* Main Content Styling */
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px 40px;
-            overflow: hidden;
-        }
-
-        .search-box {
-            margin-bottom: 20px;
-        }
-
-        .search-box input {
-            padding: 10px;
-            width: 300px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .table-container {
-            flex: 1;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #2C3E50;
-            color: white;
-        }
-
-        .btn {
-            background-color: #2C3E50;
-            color: white;
-            padding: 5px 10px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background-color: #1A252F;
-        }
-
-        /* Footer Styling */
-        footer {
-            background-color: #2C3E50;
-            color: white;
-            text-align: center;
-            padding: 15px 0;
-        }
     </style>
 </head>
 <body>
-    <header>
-        <div class="page-title">List Users</div>
-        <a href="/" class="logout-btn">Logout</a>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">List Users</div>
+            <a href="/" class="logout-btn" onclick="localStorage.clear();">Logout</a>
+        </nav>
     </header>
+
     <div class="breadcrumb">
         <a href="/admin">Admin Dashboard</a> > <a href="/list-users">List Users</a>
     </div>
+
     <main>
+        <h2>User Management</h2>
         <div class="search-box">
             <input type="text" id="search" placeholder="Search by username..." oninput="filterUsers()">
         </div>
@@ -153,68 +48,146 @@
                 <thead>
                     <tr>
                         <th>Username</th>
-                        <th>Score</th> <!-- New Column -->
+                        <th>Score</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="users-table">
-                    <!-- Users will be dynamically populated here -->
                 </tbody>
             </table>
         </div>
     </main>
-    <footer>
-        <p>&copy; 2025 Your Company. All rights reserved.</p>
+
+    <footer class="footer">
+        <p>&copy; 2025 DISC Personality. All rights reserved.</p>
     </footer>
+
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to delete this user? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button id="confirm-delete" class="btn btn-danger">Yes, Delete</button>
+                <button id="cancel-delete" class="btn btn-secondary">No, Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-modal" class="modal">
+        <div class="modal-content">
+            <p id="result-message"></p>
+            <button id="close-result-modal" class="btn">OK</button>
+        </div>
+    </div>
 
     <script>
         let userToDelete = null;
 
         // Fetch users and populate the table
-        fetch('/api/users')
-            .then(response => response.json())
-            .then(users => {
-                const tableBody = document.querySelector('#users-table');
-                tableBody.innerHTML = '';
-                users.forEach(user => {
-                    if (user.username !== 'admin') { // Prevent admin deletion
-                        tableBody.innerHTML += `
-                            <tr>
+        function fetchAndDisplayUsers() {
+            fetch('/api/users')
+                .then(response => {
+                    if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+                    return response.json();
+                })
+                .then(users => {
+                    const tableBody = document.querySelector('#users-table');
+                    tableBody.innerHTML = ''; // Clear existing rows
+                    users.forEach(user => {
+                        // Exclude the admin user ('sangram') from being listed for deletion
+                        if (user.username !== 'sangram') {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
                                 <td>${user.username}</td>
-                                <td>${user.score || 'No Score'}</td> <!-- Display formatted score -->
-                                <td><button class="btn" onclick="showConfirmationModal('${user.username}')">Delete</button></td>
-                            </tr>
-                        `;
-                    }
+                                <td>${user.score || 'No Score'}</td>
+                                <td><button class="btn btn-danger" onclick="showConfirmationModal('${user.username}')">Delete</button></td>
+                            `;
+                            tableBody.appendChild(row);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching users:', error);
+                    const tableBody = document.querySelector('#users-table');
+                    tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color: red;">Could not load users.</td></tr>';
                 });
-            })
-            .catch(error => {
-                console.error('Error fetching users:', error);
-            });
+        }
 
         // Show confirmation modal
         function showConfirmationModal(username) {
+            // Prevent deleting the admin user via the button just in case
+            if (username === 'sangram') {
+                alert("Admin user cannot be deleted.");
+                return;
+            }
             userToDelete = username;
-            const modal = document.getElementById('confirmation-modal');
-            modal.style.display = 'flex';
+            document.getElementById('confirmation-modal').style.display = 'flex';
         }
 
         // Hide confirmation modal
         function hideConfirmationModal() {
-            const modal = document.getElementById('confirmation-modal');
-            modal.style.display = 'none';
+            document.getElementById('confirmation-modal').style.display = 'none';
             userToDelete = null;
         }
+
+        // Show result modal (for success or error)
+        function showResultModal(message, isSuccess) {
+            document.getElementById('result-message').textContent = message;
+            // Optional: Add styling based on success/error
+            document.getElementById('result-message').style.color = isSuccess ? 'green' : 'red';
+            document.getElementById('result-modal').style.display = 'flex';
+        }
+
+        // Hide result modal and potentially reload
+        function hideResultModal(reloadPage = false) {
+            document.getElementById('result-modal').style.display = 'none';
+            if (reloadPage) {
+                fetchAndDisplayUsers(); // Re-fetch users instead of full page reload
+            }
+        }
+
+        // Event listeners for modal buttons
+        document.getElementById('confirm-delete').addEventListener('click', () => {
+            if (userToDelete && userToDelete !== 'sangram') { // Double check admin deletion prevention
+                fetch(`/api/users/${userToDelete}`, { method: 'DELETE' })
+                    .then(response => response.json().then(data => ({ status: response.status, body: data }))) // Parse JSON regardless of status
+                    .then(result => {
+                        hideConfirmationModal();
+                        if (result.status === 200 && result.body.message) {
+                            showResultModal(result.body.message, true); // Success
+                        } else {
+                            // Handle specific errors or provide a general message
+                            const errorMessage = result.body.error || result.body.message || "Failed to delete user.";
+                            showResultModal(errorMessage, false); // Error
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error deleting user:", error);
+                        hideConfirmationModal();
+                        showResultModal("An unexpected error occurred while deleting the user.", false);
+                    });
+            } else {
+                hideConfirmationModal(); // Hide if admin or no user selected
+            }
+        });
+
+        document.getElementById('cancel-delete').addEventListener('click', hideConfirmationModal);
+        document.getElementById('close-result-modal').addEventListener('click', () => hideResultModal(true)); // Pass true to reload list on close
 
         // Filter users by username
         function filterUsers() {
             const searchValue = document.getElementById('search').value.toLowerCase();
             const rows = document.querySelectorAll('#users-table tr');
             rows.forEach(row => {
-                const username = row.querySelector('td').textContent.toLowerCase();
-                row.style.display = username.includes(searchValue) ? '' : 'none';
+                const firstCell = row.querySelector('td');
+                if (firstCell) {
+                    const username = firstCell.textContent.toLowerCase();
+                    row.style.display = username.includes(searchValue) ? '' : 'none';
+                }
             });
         }
+
+        // Initial load of users when the page is ready
+        document.addEventListener('DOMContentLoaded', fetchAndDisplayUsers);
     </script>
 </body>
 </html>
