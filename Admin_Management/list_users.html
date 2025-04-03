@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Users</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #eef1f7;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header Styling */
+        header {
+            background-color: #2C3E50;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background-color: #E74C3C;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #C0392B;
+        }
+
+        /* Breadcrumb Styling */
+        .breadcrumb {
+            margin: 20px 40px;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: #2C3E50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Content Styling */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 40px;
+            overflow: hidden;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #2C3E50;
+            color: white;
+        }
+
+        .btn {
+            background-color: #2C3E50;
+            color: white;
+            padding: 5px 10px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #1A252F;
+        }
+
+        /* Footer Styling */
+        footer {
+            background-color: #2C3E50;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="page-title">List Users</div>
+        <a href="/" class="logout-btn">Logout</a>
+    </header>
+    <div class="breadcrumb">
+        <a href="/admin">Admin Dashboard</a> > <a href="/list-users">List Users</a>
+    </div>
+    <main>
+        <div class="search-box">
+            <input type="text" id="search" placeholder="Search by username..." oninput="filterUsers()">
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Score</th> <!-- New Column -->
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table">
+                    <!-- Users will be dynamically populated here -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 Your Company. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let userToDelete = null;
+
+        // Fetch users and populate the table
+        fetch('/api/users')
+            .then(response => response.json())
+            .then(users => {
+                const tableBody = document.querySelector('#users-table');
+                tableBody.innerHTML = '';
+                users.forEach(user => {
+                    if (user.username !== 'admin') { // Prevent admin deletion
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td>${user.username}</td>
+                                <td>${user.score || 'No Score'}</td> <!-- Display formatted score -->
+                                <td><button class="btn" onclick="showConfirmationModal('${user.username}')">Delete</button></td>
+                            </tr>
+                        `;
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+            });
+
+        // Show confirmation modal
+        function showConfirmationModal(username) {
+            userToDelete = username;
+            const modal = document.getElementById('confirmation-modal');
+            modal.style.display = 'flex';
+        }
+
+        // Hide confirmation modal
+        function hideConfirmationModal() {
+            const modal = document.getElementById('confirmation-modal');
+            modal.style.display = 'none';
+            userToDelete = null;
+        }
+
+        // Filter users by username
+        function filterUsers() {
+            const searchValue = document.getElementById('search').value.toLowerCase();
+            const rows = document.querySelectorAll('#users-table tr');
+            rows.forEach(row => {
+                const username = row.querySelector('td').textContent.toLowerCase();
+                row.style.display = username.includes(searchValue) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>

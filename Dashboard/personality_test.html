@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Test</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #eef1f7;
+            color: #333;
+        }
+
+        /* Header Styling */
+        header {
+            background-color: #008080; /* Teal */
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        /* Main Content Styling */
+        main {
+            padding: 20px 40px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #008080; /* Teal */
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .question p {
+            font-weight: bold;
+        }
+
+        .options {
+            margin-left: 20px;
+        }
+
+        .options label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background-color: #008080; /* Teal */
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background-color: #006666; /* Darker Teal */
+        }
+
+        /* Footer Styling */
+        footer {
+            background-color: #008080; /* Teal */
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="page-title">Personality Test</div>
+    </header>
+    <main>
+        <h1>Take the Personality Test</h1>
+        <form id="test-form">
+            <div id="questions-container">
+                <!-- Questions will be dynamically populated here -->
+            </div>
+            <button type="submit" class="btn">Submit Test</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 Your Company. All rights reserved.</p>
+    </footer>
+    <script>
+        // Retrieve the logged-in username dynamically
+        const username = localStorage.getItem("username"); // Assuming the username is stored in localStorage during login
+
+        if (!username) {
+            alert("You are not logged in. Redirecting to login page...");
+            window.location.href = "/";
+        }
+
+        const apiUrl = "/api/personality_test";
+
+        // Fetch 50 random questions and populate the form
+        fetch(`${apiUrl}/questions`)
+            .then(response => response.json())
+            .then(questions => {
+                const container = document.getElementById("questions-container");
+                questions.forEach((question, index) => {
+                    const questionDiv = document.createElement("div");
+                    questionDiv.classList.add("question");
+                    questionDiv.innerHTML = `
+                        <p>${index + 1}. ${question.question}</p>
+                        <div class="options">
+                            <label><input type="radio" name="question_${question.id}" value="dominance" required> ${question.dominance}</label>
+                            <label><input type="radio" name="question_${question.id}" value="influence"> ${question.influence}</label>
+                            <label><input type="radio" name="question_${question.id}" value="steadiness"> ${question.steadiness}</label>
+                            <label><input type="radio" name="question_${question.id}" value="conscientiousness"> ${question.conscientiousness}</label>
+                        </div>
+                    `;
+                    container.appendChild(questionDiv);
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching questions:", error);
+                alert("Failed to load questions. Please try again later.");
+            });
+
+        // Submit the test
+        document.getElementById("test-form").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const answers = {};
+            formData.forEach((value, key) => {
+                answers[key] = value;
+            });
+            fetch(`${apiUrl}/submit`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, answers }),
+            })
+                .then(response => response.json())
+                .then(result => {
+                    alert("Test submitted successfully!");
+                    window.location.href = "/Dashboard/dashboard.html";
+                })
+                .catch(error => {
+                    console.error("Error submitting test:", error);
+                    alert("Failed to submit the test. Please try again.");
+                });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Questions</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #eef1f7;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header Styling */
+        header {
+            background-color: #2C3E50;
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background-color: #E74C3C;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #C0392B;
+        }
+
+        /* Breadcrumb Styling */
+        .breadcrumb {
+            margin: 20px 40px;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: #2C3E50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Main Content Styling */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 40px;
+            overflow: hidden;
+        }
+
+        .add-question-btn {
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #2C3E50;
+            color: white;
+        }
+
+        .btn {
+            background-color: #2C3E50;
+            color: white;
+            padding: 5px 10px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #1A252F;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .modal-buttons .btn {
+            padding: 10px 20px;
+        }
+
+        /* Footer Styling */
+        footer {
+            background-color: #2C3E50;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="page-title">List Questions</div>
+        <a href="/" class="logout-btn">Logout</a>
+    </header>
+    <div class="breadcrumb">
+        <a href="/admin">Admin Dashboard</a> > <a href="/list-questions">List Questions</a>
+    </div>
+    <main>
+        <a href="/add-question" class="btn add-question-btn">Add New Question</a>
+        <div class="search-box">
+            <input type="text" id="search" placeholder="Search by question..." oninput="filterQuestions()">
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>Dominance</th>
+                        <th>Influence</th>
+                        <th>Steadiness</th>
+                        <th>Conscientiousness</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="questions-table">
+                    <!-- Questions will be dynamically populated here -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 Your Company. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let questionToDelete = null;
+
+        // Fetch questions and populate the table
+        fetch('/api/questions')
+            .then(response => response.json())
+            .then(questions => {
+                const tableBody = document.getElementById('questions-table');
+                tableBody.innerHTML = '';
+                questions.forEach(question => {
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${question.question}</td>
+                            <td>${question.dominance}</td>
+                            <td>${question.influence}</td>
+                            <td>${question.steadiness}</td>
+                            <td>${question.conscientiousness}</td>
+                            <td><button class="btn" onclick="showConfirmationModal(${question.id})">Delete</button></td>
+                        </tr>
+                    `;
+                });
+            });
+
+        // Show confirmation modal
+        function showConfirmationModal(id) {
+            questionToDelete = id;
+            const modal = document.getElementById('confirmation-modal');
+            modal.style.display = 'flex';
+        }
+
+        // Hide confirmation modal
+        function hideConfirmationModal() {
+            const modal = document.getElementById('confirmation-modal');
+            modal.style.display = 'none';
+            questionToDelete = null;
+        }
+
+        // Show success modal
+        function showSuccessModal() {
+            const modal = document.getElementById('success-modal');
+            modal.style.display = 'flex';
+        }
+
+        // Hide success modal
+        function hideSuccessModal() {
+            const modal = document.getElementById('success-modal');
+            modal.style.display = 'none';
+        }
+
+        // Confirm delete
+        document.getElementById('confirm-delete').addEventListener('click', () => {
+            if (questionToDelete) {
+                fetch(`/api/questions/${questionToDelete}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(result => {
+                        showSuccessModal();
+                        const closeSuccessModalButton = document.getElementById('close-success-modal');
+                        closeSuccessModalButton.addEventListener('click', () => {
+                            hideSuccessModal();
+                            location.reload();
+                        });
+                    });
+            }
+            hideConfirmationModal();
+        });
+
+        // Cancel delete
+        document.getElementById('cancel-delete').addEventListener('click', hideConfirmationModal);
+
+        // Filter questions by search input
+        function filterQuestions() {
+            const searchValue = document.getElementById('search').value.toLowerCase();
+            const rows = document.querySelectorAll('#questions-table tr');
+            rows.forEach(row => {
+                const questionText = row.querySelector('td').textContent.toLowerCase();
+                row.style.display = questionText.includes(searchValue) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
