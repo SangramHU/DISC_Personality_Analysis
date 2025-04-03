@@ -28,6 +28,36 @@
             font-weight: bold;
         }
 
+        .logout-btn {
+            background-color: #E74C3C;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #C0392B;
+        }
+
+        /* Breadcrumb Styling */
+        .breadcrumb {
+            margin: 20px 40px;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: #008080;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
         /* Main Content Styling */
         main {
             padding: 20px 40px;
@@ -85,7 +115,11 @@
 <body>
     <header>
         <div class="page-title">Personality Test</div>
+        <a href="/" class="logout-btn" onclick="localStorage.clear();">Logout</a>
     </header>
+    <div class="breadcrumb">
+        <a href="/Dashboard/dashboard.html">Dashboard</a> > <a href="/Dashboard/personality_test.html">Personality Test</a>
+    </div>
     <main>
         <h1>Take the Personality Test</h1>
         <p>Logged in as: <span id="logged-in-username">Loading...</span></p> <!-- Display Logged-in Username -->
