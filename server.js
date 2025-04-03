@@ -13,6 +13,7 @@ app.use('/Dashboard', express.static(path.join(__dirname, 'Dashboard')));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // To handle JSON requests
+app.use('/Style', express.static(path.join(__dirname, 'Style')));
 
 // Serve the login page (index.html)
 app.get('/', (req, res) => {
@@ -56,21 +57,23 @@ db.serialize(() => {
     `);
 });
 
-// Handle login requests
+/// Handle login requests
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
-    // Check for admin credentials
-    if (username === 'sangram' && password === 'sangram') {
+    if (!username || !password) {
         return res.send(`
             <script>
-                localStorage.setItem('username', '${username}');
-                window.location.href = '/admin';
+                document.addEventListener('DOMContentLoaded', () => {
+                    const errorDiv = document.getElementById('login-error-message');
+                    errorDiv.textContent = 'Please enter both username and password.';
+                    errorDiv.style.display = 'block';
+                });
             </script>
+            ${fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8')}
         `);
     }
 
-    // Check for regular user credentials
     db.get('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], (err, row) => {
         if (err) {
             res.status(500).send('Server error');
@@ -82,17 +85,69 @@ app.post('/login', (req, res) => {
                 </script>
             `);
         } else {
-            // Render the login page with an error message
             res.send(`
                 <script>
                     document.addEventListener('DOMContentLoaded', () => {
-                        const errorDiv = document.getElementById('error-message');
-                        errorDiv.textContent = 'Invalid username or password';
+                        const errorDiv = document.getElementById('login-error-message');
+                        errorDiv.textContent = 'Invalid username or password.';
                         errorDiv.style.display = 'block';
                     });
                 </script>
                 ${fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8')}
             `);
+        }
+    });
+});
+
+// Handle sign-up requests
+app.post('/signup', (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.send(`
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const errorDiv = document.getElementById('signup-error-message');
+                    errorDiv.textContent = 'Please enter both username and password.';
+                    errorDiv.style.display = 'block';
+                });
+            </script>
+            ${fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8')}
+        `);
+    }
+
+    db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+        if (err) {
+            res.status(500).send('Server error');
+        } else if (row) {
+            res.send(`
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const errorDiv = document.getElementById('signup-error-message');
+                        errorDiv.textContent = 'Username already exists. Please choose a different one.';
+                        errorDiv.style.display = 'block';
+                    });
+                </script>
+                ${fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8')}
+            `);
+        } else {
+            db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, password], (err) => {
+                if (err) {
+                    res.status(500).send('Error registering user');
+                } else {
+                    res.send(`
+                        <script>
+                            document.addEventListener('DOMContentLoaded', () => {
+                                const errorDiv = document.getElementById('signup-error-message');
+                                errorDiv.textContent = 'User registered successfully! You can now log in.';
+                                errorDiv.style.color = 'green';
+                                errorDiv.style.display = 'block';
+                            });
+                        </script>
+                        ${fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8')}
+                    `);
+                }
+            });
         }
     });
 });
@@ -107,49 +162,7 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'Admin_Management', 'admin.html'));
 });
 
-// Handle sign-up requests
-app.post('/signup', (req, res) => {
-    const { username, password } = req.body;
 
-    // Check if the username already exists
-    db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
-        if (err) {
-            res.status(500).send('Server error');
-        } else if (row) {
-            // Render the login page with an error message for existing user
-            res.send(`
-                <script>
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const errorDiv = document.getElementById('error-message');
-                        errorDiv.textContent = 'Username already exists. Please choose a different one.';
-                        errorDiv.style.display = 'block';
-                    });
-                </script>
-                ${fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8')}
-            `);
-        } else {
-            // Insert the new user into the database
-            db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, password], (err) => {
-                if (err) {
-                    res.status(500).send('Error registering user');
-                } else {
-                    // Render the login page with a success message
-                    res.send(`
-                        <script>
-                            document.addEventListener('DOMContentLoaded', () => {
-                                const errorDiv = document.getElementById('error-message');
-                                errorDiv.textContent = 'User registered successfully! You can now log in.';
-                                errorDiv.style.color = 'green';
-                                errorDiv.style.display = 'block';
-                            });
-                        </script>
-                        ${fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8')}
-                    `);
-                }
-            });
-        }
-    });
-});
 
 // Serve the list users page
 app.get('/list-users', (req, res) => {
@@ -311,103 +324,6 @@ app.get('/api/personality_test/score', (req, res) => {
     });
 });
 
-// // API to handle chat queries
-// app.post('/api/chat', (req, res) => {
-//     const { username, query } = req.body;
-
-//     if (!username || !query) {
-//         return res.status(400).json({ error: 'Username and query are required' });
-//     }
-
-//     // Fetch the user's DISC score from the database
-//     db.get(
-//         `SELECT score FROM personality_test_progress WHERE username = ?`,
-//         [username],
-//         (err, row) => {
-//             if (err) {
-//                 console.error('Error fetching DISC score:', err);
-//                 return res.status(500).json({ error: 'Failed to fetch DISC score' });
-//             }
-
-//             if (!row || !row.score) {
-//                 return res.status(404).json({ error: 'DISC score not found for the user' });
-//             }
-
-//             const DISC_SCORE = row.score;
-
-//             // Format the prompt for the Gemini AI model
-//             const prompt = `
-//                 You are an expert behavioral AI utilizing DISC personality analysis. The user has provided their DISC profile score in the format aDbIcSdC, where:
-
-//                 'a%' represents Dominance (D)
-//                 'b%' represents Influence (I)
-//                 'c%' represents Steadiness (S)
-//                 'd%' represents Conscientiousness (C)
-
-//                 Interpret the user’s DISC score to understand their behavioral tendencies, communication style, and decision-making approach. Then, answer their query in a way that aligns with their DISC profile, ensuring clarity, relevance, and personalization.
-
-//                 User's DISC Score: ${DISC_SCORE}
-//                 User's Query: ${query}
-
-//                 Provide a detailed and insightful response tailored to the user’s DISC profile.
-//             `;
-
-//             // Call the Gemini AI model (replace with actual API call)
-//             callGeminiAI(prompt)
-//                 .then(response => {
-//                     res.json({ reply: response });
-//                 })
-//                 .catch(error => {
-//                     console.error('Error calling Gemini AI:', error);
-//                     res.status(500).json({ error: 'Failed to process the query' });
-//                 });
-//         }
-//     );
-// });
-
-// const axios = require('axios'); // Import axios for HTTP requests
-// require('dotenv').config(); // Load environment variables from a .env file
-
-// async function callGeminiAI(prompt) {
-//     console.log('Preparing to call Gemini AI with the following prompt:');
-//     console.log(prompt); // Log the prompt being sent to the Gemini API
-
-//     try {
-//         const response = await axios.post(
-//             process.env.GEMINI_API_URL, // Gemini API URL from environment variables
-//             {
-//                 prompt: prompt, // The prompt to send to the Gemini API
-//                 max_tokens: 500, // Adjust the token limit as needed
-//                 temperature: 0.7, // Adjust the temperature for response creativity
-//             },
-//             {
-//                 headers: {
-//                     'Content-Type': 'application/json',
-//                     Authorization: `Bearer ${process.env.GEMINI_API_KEY}`, // API key from environment variables
-//                 },
-//             }
-//         );
-
-//         // Log the response from the Gemini API
-//         console.log('Response received from Gemini AI:');
-//         console.log(response.data);
-
-//         // Return the AI's response
-//         return response.data.choices[0].text.trim();
-//     } catch (error) {
-//         // Log the error details
-//         console.error('Error occurred while calling Gemini AI:');
-//         if (error.response) {
-//             console.error('Status Code:', error.response.status);
-//             console.error('Response Data:', error.response.data);
-//         } else {
-//             console.error('Error Message:', error.message);
-//         }
-
-//         // Throw an error to be handled by the caller
-//         throw new Error('Failed to process the query with Gemini AI');
-//     }
-// }
 
 
 require('dotenv').config();  // Load environment variables

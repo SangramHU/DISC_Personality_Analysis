@@ -3,143 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Take the DISC personality analysis to unlock your true potential and understand your behavioral style.">
     <title>DISC Personality Analysis</title>
+    <link rel="stylesheet" href="Style/style.css"> <!-- Updated path to CSS file -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #eef1f7;
-            color: #333;
-        }
-
-        /* Header Styling */
-        header {
-            background-color: #008080; /* Teal */
-            color: white;
-            padding: 20px 40px;
+        /* Reduce the height of the hero section */
+        .hero {
+            min-height: 200px; /* Reduced height */
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .page-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-
-        .site-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        /* Form Wrapper Styling */
-        .form-wrapper {
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-start;
-            margin: 50px auto;
-            max-width: 900px;
-        }
-
-        .container {
-            width: 45%;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
+            justify-content: center;
             text-align: center;
-            color: #008080; /* Teal */
+            padding: 1rem; /* Adjusted padding */
         }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
+        .hero-content h1 {
+            font-size: 2rem; /* Reduced font size */
             font-weight: bold;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
         }
 
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+        /* Shift login boxes upward */
+        .auth-container {
+            margin-top: -50px; /* Shifted upward */
         }
 
-        button {
-            background-color: #008080; /* Teal */
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            width: 100%;
-        }
-
-        button:hover {
-            background-color: #006666; /* Darker Teal */
-        }
-
-        #error-message {
-            display: none;
+        .error-message {
             color: red;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        /* Footer Styling */
-        footer {
-            background-color: #008080; /* Teal */
-            color: white;
-            text-align: center;
-            padding: 15px 0;
-            margin-top: 40px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none; /* Initially hidden */
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="page-title">DISC Personality Analysis</div>
-        <div class="site-name">Welcome</div>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">DISC Personality</div>
+            <ul>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Unlock Your True Potential</h1>
+            </div>
+        </section>
     </header>
 
-    <div id="error-message"></div>
+    <main>
+        <section id="auth" class="container auth-container">
+            <div class="form-wrapper">
+                <h2>Login</h2>
+                <form id="login-form" action="/login" method="POST">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <div id="login-error-message" class="error-message"></div>
+                    <button type="submit" class="btn">Login</button>
+                </form>
+            </div>
 
-    <div class="form-wrapper">
-        <div class="container">
-            <h1>Login</h1>
-            <form action="/login" method="POST">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-                <button type="submit">Login</button>
-            </form>
-        </div>
+            <div class="form-wrapper">
+                <h2>Sign Up</h2>
+                <form id="signup-form" action="/signup" method="POST">
+                    <div class="form-group">
+                        <label for="newUsername">Username:</label>
+                        <input type="text" id="newUsername" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Password:</label>
+                        <input type="password" id="newPassword" name="password" required>
+                    </div>
+                    <div id="signup-error-message" class="error-message"></div>
+                    <button type="submit" class="btn btn-secondary">Sign Up</button>
+                </form>
+            </div>
+        </section>
 
-        <div class="container">
-            <h1>Sign-Up</h1>
-            <form action="/signup" method="POST">
-                <label for="newUsername">Username:</label>
-                <input type="text" id="newUsername" name="username" required>
-                <label for="newPassword">Password:</label>
-                <input type="password" id="newPassword" name="password" required>
-                <button type="submit">Sign Up</button>
-            </form>
-        </div>
-    </div>
+        <section id="about" class="container about-section">
+            <h2>About DISC Personality Analysis</h2>
+            <p>Learn more about the DISC model and how understanding your personality type can benefit you in various aspects of life, including work and relationships.</p>
+        </section>
+    </main>
 
-    <footer>
-        <p>&copy; 2025 Your Company. All rights reserved.</p>
+    <footer id="contact" class="footer">
+        <p>Contact us at <a href="mailto:info@discpersonality.com">info@discpersonality.com</a></p>
+        <p>&copy; 2025 DISC Personality. All rights reserved.</p>
     </footer>
+
     <script>
-    <a href="/" class="logout-btn" onclick="localStorage.clear();">Logout</a>
-</script>
-    </body>
+        // Handle login form submission
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('login-error-message');
+
+            if (!username || !password) {
+                e.preventDefault(); // Prevent form submission
+                errorMessage.textContent = 'Please enter both username and password.';
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        // Handle signup form submission
+        document.getElementById('signup-form').addEventListener('submit', function (e) {
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value.trim();
+            const errorMessage = document.getElementById('signup-error-message');
+
+            if (!username || !password) {
+                e.preventDefault(); // Prevent form submission
+                errorMessage.textContent = 'Please enter both username and password.';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
 </html>
