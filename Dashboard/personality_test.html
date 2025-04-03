@@ -4,48 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personality Test</title>
+    <link rel="stylesheet" href="../Style/style.css">
     <style>
+        /* Additional styles specific to the personality test page */
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #eef1f7;
-            color: #333;
-        }
-
-        /* Header Styling */
-        header {
-            background-color: #008080; /* Teal */
-            color: white;
-            padding: 20px 40px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        .page-title {
-            font-size: 1.8rem;
-            font-weight: bold;
+        main {
+            flex: 1;
+            padding: 0 20px 40px;
         }
 
-        .logout-btn {
-            background-color: #E74C3C;
-            color: white;
-            padding: 8px 15px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border-radius: 5px;
-            transition: 0.3s;
+        .test-container {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
-        .logout-btn:hover {
-            background-color: #C0392B;
+        .test-container h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #005f5f;
         }
 
-        /* Breadcrumb Styling */
         .breadcrumb {
-            margin: 20px 40px;
+            max-width: 1100px;
+            margin: 20px auto 0;
+            padding: 0 30px;
             font-size: 0.9rem;
+            text-align: left;
         }
 
         .breadcrumb a {
@@ -58,142 +51,220 @@
             text-decoration: underline;
         }
 
-        /* Main Content Styling */
-        main {
-            padding: 20px 40px;
-        }
-
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            color: #008080; /* Teal */
-        }
-
         .question {
-            margin-bottom: 20px;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
         }
 
         .question p {
             font-weight: bold;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: #343a40;
         }
 
         .options {
-            margin-left: 20px;
+            margin-left: 10px;
         }
 
         .options label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 0.8rem;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #495057;
+            line-height: 1.4;
         }
 
-        .btn {
-            background-color: #008080; /* Teal */
+        .options label:hover {
+            color: #005f5f;
+        }
+
+        .options input[type="radio"] {
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        #test-form button.btn {
+            display: block;
+            width: auto;
+            min-width: 150px;
+            margin: 2rem auto 0;
+            padding: 12px 30px;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .modal-content button {
+            background-color: #008080;
             color: white;
             padding: 10px 20px;
-            text-decoration: none;
-            font-size: 1rem;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
-            margin-right: 10px;
+            font-size: 1rem;
         }
 
-        .btn:hover {
-            background-color: #006666; /* Darker Teal */
-        }
-
-        /* Footer Styling */
-        footer {
-            background-color: #008080; /* Teal */
-            color: white;
-            text-align: center;
-            padding: 15px 0;
-            margin-top: 40px;
+        .modal-content button:hover {
+            background-color: #006666;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="page-title">Personality Test</div>
-        <a href="/" class="logout-btn" onclick="localStorage.clear();">Logout</a>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">Personality Test</div>
+            <a href="/" class="logout-btn-header" onclick="localStorage.clear();">Logout</a>
+        </nav>
     </header>
+
     <div class="breadcrumb">
         <a href="/Dashboard/dashboard.html">Dashboard</a> > <a href="/Dashboard/personality_test.html">Personality Test</a>
     </div>
+
     <main>
-        <h1>Take the Personality Test</h1>
-        <p>Logged in as: <span id="logged-in-username">Loading...</span></p> <!-- Display Logged-in Username -->
-        <form id="test-form">
-            <div id="questions-container">
-                <!-- Questions will be dynamically populated here -->
-            </div>
-            <button type="submit" class="btn">Submit Test</button>
-        </form>
+        <div class="test-container">
+            <h1>Take the Personality Test</h1>
+            <p>Logged in as: <span id="logged-in-username">Loading...</span></p>
+            <form id="test-form">
+                <div id="questions-container"></div>
+                <button type="submit" class="btn">Submit Test</button>
+            </form>
+        </div>
     </main>
-    <footer>
-        <p>&copy; 2025 Your Company. All rights reserved.</p>
+
+    <footer class="footer">
+        <p>Contact us at <a href="mailto:info@discpersonality.com">info@discpersonality.com</a></p>
+        <p>&copy; 2025 DISC Personality. All rights reserved.</p>
     </footer>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <p>Test submitted successfully!</p>
+            <button id="success-ok-button">OK</button>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal">
+        <div class="modal-content">
+            <p>Failed to submit the test. Please try again.</p>
+            <button id="error-ok-button">OK</button>
+        </div>
+    </div>
+
     <script>
         const username = localStorage.getItem("username");
 
         if (!username) {
             alert("You are not logged in. Redirecting to login page...");
             window.location.href = "/";
-        }
+        } else {
+            document.getElementById('logged-in-username').textContent = username;
 
-        // Display the logged-in username
-        document.getElementById('logged-in-username').textContent = username;
+            const apiUrl = "/api/personality_test";
 
-        const apiUrl = "/api/personality_test";
-
-        // Fetch 50 random questions and populate the form
-        fetch(`${apiUrl}/questions`)
-            .then(response => response.json())
-            .then(questions => {
-                const container = document.getElementById("questions-container");
-                questions.forEach((question, index) => {
-                    const questionDiv = document.createElement("div");
-                    questionDiv.classList.add("question");
-                    questionDiv.innerHTML = `
-                        <p>${index + 1}. ${question.question}</p>
-                        <div class="options">
-                            <label><input type="radio" name="question_${question.id}" value="dominance" required> ${question.dominance}</label>
-                            <label><input type="radio" name="question_${question.id}" value="influence"> ${question.influence}</label>
-                            <label><input type="radio" name="question_${question.id}" value="steadiness"> ${question.steadiness}</label>
-                            <label><input type="radio" name="question_${question.id}" value="conscientiousness"> ${question.conscientiousness}</label>
-                        </div>
-                    `;
-                    container.appendChild(questionDiv);
-                });
-            })
-            .catch(error => {
-                console.error("Error fetching questions:", error);
-                alert("Failed to load questions. Please try again later.");
-            });
-
-        // Submit the test
-        document.getElementById("test-form").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const answers = {};
-            formData.forEach((value, key) => {
-                answers[key] = value;
-            });
-            fetch(`${apiUrl}/submit`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, answers }),
-            })
-                .then(response => response.json())
-                .then(result => {
-                    alert("Test submitted successfully!");
-                    window.location.href = "/Dashboard/dashboard.html";
+            // Fetch questions and populate the form
+            fetch(`${apiUrl}/questions`)
+                .then(response => {
+                    if (!response.ok) { throw new Error('Network response was not ok'); }
+                    return response.json();
+                })
+                .then(questions => {
+                    const container = document.getElementById("questions-container");
+                    container.innerHTML = '';
+                    questions.forEach((question, index) => {
+                        const questionDiv = document.createElement("div");
+                        questionDiv.classList.add("question");
+                        questionDiv.innerHTML = `
+                            <p>${index + 1}. ${question.question}</p>
+                            <div class="options">
+                                <label><input type="radio" name="question_${question.id}" value="dominance" required> ${question.dominance}</label>
+                                <label><input type="radio" name="question_${question.id}" value="influence"> ${question.influence}</label>
+                                <label><input type="radio" name="question_${question.id}" value="steadiness"> ${question.steadiness}</label>
+                                <label><input type="radio" name="question_${question.id}" value="conscientiousness"> ${question.conscientiousness}</label>
+                            </div>
+                        `;
+                        container.appendChild(questionDiv);
+                    });
                 })
                 .catch(error => {
-                    console.error("Error submitting test:", error);
-                    alert("Failed to submit the test. Please try again.");
+                    console.error("Error fetching questions:", error);
+                    alert("Failed to load questions. Please try again later.");
                 });
-        });
+
+            // Submit the test
+            const testForm = document.getElementById("test-form");
+            testForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const answers = {};
+                formData.forEach((value, key) => {
+                    answers[key] = value;
+                });
+
+                fetch(`${apiUrl}/submit`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, answers }),
+                })
+                    .then(response => {
+                        if (!response.ok) { throw new Error('Failed to submit'); }
+                        return response.json();
+                    })
+                    .then(() => {
+                        // Show success modal
+                        const successModal = document.getElementById("success-modal");
+                        successModal.style.display = "flex";
+
+                        document.getElementById("success-ok-button").addEventListener("click", () => {
+                            successModal.style.display = "none";
+                            window.location.href = "/Dashboard/dashboard.html";
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error submitting test:", error);
+
+                        // Show error modal
+                        const errorModal = document.getElementById("error-modal");
+                        errorModal.style.display = "flex";
+
+                        document.getElementById("error-ok-button").addEventListener("click", () => {
+                            errorModal.style.display = "none";
+                        });
+                    });
+            });
+        }
     </script>
 </body>
 </html>

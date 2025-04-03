@@ -57,7 +57,7 @@ db.serialize(() => {
     `);
 });
 
-/// Handle login requests
+// Handle login requests
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
@@ -74,6 +74,17 @@ app.post('/login', (req, res) => {
         `);
     }
 
+    // Check if the user is the admin
+    if (username === 'sangram' && password === 'sangram') {
+        return res.send(`
+            <script>
+                localStorage.setItem('username', '${username}');
+                window.location.href = '/admin';
+            </script>
+        `);
+    }
+
+    // Check for regular users in the database
     db.get('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], (err, row) => {
         if (err) {
             res.status(500).send('Server error');
@@ -352,32 +363,47 @@ async function callGeminiAI(prompt) {
 
 // API endpoint to process chat queries
 app.post("/api/chat", async (req, res) => {
-    const { username, query, discScore } = req.body; // Accept discScore from the request body
+    const { username, query } = req.body;
 
-    if (!username || !query || !discScore) {
-        return res.status(400).json({ error: "Username, query, and DISC score are required" });
+    if (!username || !query) {
+        return res.status(400).json({ error: "Username and query are required" });
     }
 
-    const prompt = `
-        You are an expert behavioral AI using DISC personality analysis. The user has provided their DISC profile score:
+    // Fetch the DISC score for the user
+    db.get('SELECT score FROM personality_test_progress WHERE username = ?', [username], async (err, row) => {
+        if (err) {
+            console.error("Error fetching DISC score:", err);
+            return res.status(500).json({ error: "Failed to fetch DISC score" });
+        }
 
-        'D' = Dominance: ${discScore.split('D')[0]}%
-        'I' = Influence: ${discScore.split('D')[1].split('I')[0]}%
-        'S' = Steadiness: ${discScore.split('I')[1].split('S')[0]}%
-        'C' = Conscientiousness: ${discScore.split('S')[1].split('C')[0]}%
+        if (!row || !row.score) {
+            return res.status(400).json({ error: "DISC score not found. Please complete the personality test first." });
+        }
 
-        User's Query: ${query}
+        const discScore = row.score;
 
-        Provide a response tailored to their DISC profile. Do not mention or discuss the DISC score in the response.
-    `;
+        // Generate the prompt for Gemini AI
+        const prompt = `
+            You are an expert behavioral AI using DISC personality analysis. The user has provided their DISC profile score:
 
-    try {
-        const response = await callGeminiAI(prompt);
-        res.json({ reply: response });
-    } catch (error) {
-        console.error("Error occurred while processing the chat query:", error);
-        res.status(500).json({ error: "Failed to generate response" });
-    }
+            'D' = Dominance: ${discScore.split('D')[0]}%
+            'I' = Influence: ${discScore.split('D')[1].split('I')[0]}%
+            'S' = Steadiness: ${discScore.split('I')[1].split('S')[0]}%
+            'C' = Conscientiousness: ${discScore.split('S')[1].split('C')[0]}%
+
+            User's Query: ${query}
+
+            Provide a response tailored to their DISC profile. Do not mention or discuss the DISC score in the response.
+        `;
+
+        try {
+            const response = await callGeminiAI(prompt);
+            res.json({ reply: response });
+        } catch (error) {
+            console.error("Error occurred while processing the chat query:", error);
+            res.status(500).json({ error: "Failed to generate response" });
+        }
+    });
 });
 
 // Start the server
