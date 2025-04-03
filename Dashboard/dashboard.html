@@ -131,26 +131,28 @@
         <p>&copy; 2025 Your Company. All rights reserved.</p>
     </footer>
 
-    <script>
-        const username = localStorage.getItem("username");
+        <script>
+            // Check if the user is logged in
+const username = localStorage.getItem("username");
 
-        if (!username) {
-            alert("You are not logged in. Redirecting to login page...");
-            window.location.href = "/";
-        }
+if (!username) {
+    alert("You are not logged in. Redirecting to login page...");
+    window.location.href = "/";
+}
 
-        // Display the logged-in username
-        document.getElementById('logged-in-username').textContent = username;
+// Display the logged-in username
+document.getElementById('logged-in-username').textContent = username;
 
-        // Fetch the logged-in user's score
-        fetch(`/api/personality_test/score?username=${username}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('user-score').textContent = data.score || 'No Score';
-            })
-            .catch(() => {
-                document.getElementById('user-score').textContent = "Error fetching score";
-            });
+// Fetch the logged-in user's score
+fetch(`/api/personality_test/score?username=${username}`)
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('user-score').textContent = data.score || 'No Score';
+    })
+    .catch(() => {
+        document.getElementById('user-score').textContent = "Error fetching score";
+    });
+    
     </script>
 </body>
 </html>

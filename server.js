@@ -311,6 +311,70 @@ app.get('/api/personality_test/score', (req, res) => {
     });
 });
 
+// API to handle chat queries
+app.post('/api/chat', (req, res) => {
+    const { username, query } = req.body;
+
+    if (!username || !query) {
+        return res.status(400).json({ error: 'Username and query are required' });
+    }
+
+    // Fetch the user's DISC score from the database
+    db.get(
+        `SELECT score FROM personality_test_progress WHERE username = ?`,
+        [username],
+        (err, row) => {
+            if (err) {
+                console.error('Error fetching DISC score:', err);
+                return res.status(500).json({ error: 'Failed to fetch DISC score' });
+            }
+
+            if (!row || !row.score) {
+                return res.status(404).json({ error: 'DISC score not found for the user' });
+            }
+
+            const DISC_SCORE = row.score;
+
+            // Format the prompt for the Gemini AI model
+            const prompt = `
+                You are an expert behavioral AI utilizing DISC personality analysis. The user has provided their DISC profile score in the format aDbIcSdC, where:
+
+                'a%' represents Dominance (D)
+                'b%' represents Influence (I)
+                'c%' represents Steadiness (S)
+                'd%' represents Conscientiousness (C)
+
+                Interpret the user’s DISC score to understand their behavioral tendencies, communication style, and decision-making approach. Then, answer their query in a way that aligns with their DISC profile, ensuring clarity, relevance, and personalization.
+
+                User's DISC Score: ${DISC_SCORE}
+                User's Query: ${query}
+
+                Provide a detailed and insightful response tailored to the user’s DISC profile.
+            `;
+
+            // Call the Gemini AI model (replace with actual API call)
+            callGeminiAI(prompt)
+                .then(response => {
+                    res.json({ reply: response });
+                })
+                .catch(error => {
+                    console.error('Error calling Gemini AI:', error);
+                    res.status(500).json({ error: 'Failed to process the query' });
+                });
+        }
+    );
+});
+
+// Mock function to simulate Gemini AI API call
+function callGeminiAI(prompt) {
+    return new Promise((resolve) => {
+        // Simulate AI response
+        setTimeout(() => {
+            resolve(`This is a simulated response based on the prompt: ${prompt}`);
+        }, 1000);
+    });
+}
+
 // Start the server
 app.listen(80, () => {
     console.log('Server is running on http://localhost:80');

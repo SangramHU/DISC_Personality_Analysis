@@ -154,33 +154,52 @@
     <script>
         // Check if the user is logged in
         const username = localStorage.getItem("username");
-
+    
         if (!username) {
             alert("You are not logged in. Redirecting to login page...");
             window.location.href = "/";
         }
-
+    
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
         const sendButton = document.getElementById('send-button');
-
+    
         // Handle sending messages
         sendButton.addEventListener('click', () => {
-            const message = chatInput.value.trim();
-            if (message) {
+            const query = chatInput.value.trim();
+            if (query) {
+                // Display the user's message
                 const userMessage = document.createElement('div');
-                userMessage.textContent = `You: ${message}`;
+                userMessage.textContent = `You: ${query}`;
                 chatMessages.appendChild(userMessage);
                 chatInput.value = '';
                 chatMessages.scrollTop = chatMessages.scrollHeight;
-
-                // Simulate AI response
-                setTimeout(() => {
-                    const aiMessage = document.createElement('div');
-                    aiMessage.textContent = `AI: I'm here to assist you!`;
-                    chatMessages.appendChild(aiMessage);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }, 1000);
+    
+                // Send the query to the backend
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, query }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.reply) {
+                            // Display the AI's response
+                            const aiMessage = document.createElement('div');
+                            aiMessage.textContent = `AI: ${data.reply}`;
+                            chatMessages.appendChild(aiMessage);
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        } else {
+                            throw new Error(data.error || 'Unknown error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        const errorMessage = document.createElement('div');
+                        errorMessage.textContent = 'AI: Sorry, I could not process your query at the moment.';
+                        chatMessages.appendChild(errorMessage);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    });
             }
         });
     </script>
