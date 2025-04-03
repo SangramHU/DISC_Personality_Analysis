@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Know More About DISC</title>
+    <link rel="stylesheet" href="../Style/style.css">
+    <style>
+        /* Additional styles specific to the Know More page */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .content-container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .content-container h1, .content-container h2 {
+            color: #005f5f; /* Teal heading color */
+            text-align: left; /* Align headings left */
+            margin-bottom: 1rem;
+        }
+
+        .content-container h1 {
+            text-align: center; /* Center main heading */
+            margin-bottom: 1.5rem;
+        }
+
+        .content-container h3 {
+            color: #008080; /* Slightly lighter teal for sub-headings */
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .content-container p, .content-container ul {
+            margin-bottom: 1rem;
+            line-height: 1.7; /* Improve readability */
+            color: #343a40;
+        }
+
+        .content-container ul {
+            margin-left: 20px; /* Indent lists */
+            list-style: disc; /* Use standard bullets */
+        }
+
+        .content-container strong {
+            color: #005f5f; /* Highlight DISC letters */
+        }
+
+        /* Header and breadcrumb styles */
+        .header {
+            background-color: #008080;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logout-btn-header {
+            margin-left: auto;
+            padding: 8px 16px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn-header:hover {
+            background-color: #c82333;
+            text-decoration: none;
+        }
+
+        .breadcrumb {
+            width: 100%;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            text-align: left;
+            background-color: #f8f9fa;
+        }
+
+        .breadcrumb a {
+            color: #008080;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* Ensure footer styles are applied */
+        .footer {
+            margin-top: 40px; /* Add space above the footer */
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">DISC Personality Analysis</div>
+        <button class="logout-btn-header" onclick="localStorage.clear(); window.location.href = '/';">Logout</button>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="/Dashboard/dashboard.html">Dashboard</a> > Know More
+    </div>
+
+    <main>
+        <div class="content-container">
+            <h1>Understanding DISC Personality Types</h1>
+
+            <p>The DISC model is a powerful yet simple tool for understanding people's behavioral styles and preferences. It categorizes behavior into four primary types: Dominance, Influence, Steadiness, and Conscientiousness. Understanding your own style and learning to recognize others' styles can significantly improve communication, teamwork, and relationships in all areas of your life.</p>
+
+            <h2>The Four DISC Types Explained</h2>
+
+            <h3><strong style="color: #D9534F;">D</strong> - Dominance</h3>
+            <p>Individuals with a high 'D' score tend to be direct, decisive, results-oriented, and competitive. They thrive on challenges, take action, and focus on achieving goals quickly.</p>
+            <ul>
+                <li><strong>Strengths:</strong> Leadership, confidence, efficiency, problem-solving.</li>
+                <li><strong>Challenges:</strong> Can seem impatient, insensitive, or overly demanding.</li>
+                <li><strong>Motivated by:</strong> Results, control, challenge, directness.</li>
+            </ul>
+
+            <h3><strong style="color: #F0AD4E;">I</strong> - Influence</h3>
+            <p>High 'I' individuals are typically enthusiastic, optimistic, collaborative, and persuasive. They enjoy interacting with others, building relationships, and creating a positive atmosphere.</p>
+            <ul>
+                <li><strong>Strengths:</strong> Communication, motivation, teamwork, creativity.</li>
+                <li><strong>Challenges:</strong> May lack attention to detail, be disorganized, or overly talkative.</li>
+                <li><strong>Motivated by:</strong> Recognition, social interaction, enthusiasm, freedom from control.</li>
+            </ul>
+
+            <h3><strong style="color: #5CB85C;">S</strong> - Steadiness</h3>
+            <p>Those with high 'S' scores are often described as calm, patient, supportive, and reliable. They value cooperation, stability, and consistency, and are excellent listeners.</p>
+            <ul>
+                <li><strong>Strengths:</strong> Loyalty, dependability, patience, collaboration.</li>
+                <li><strong>Challenges:</strong> May resist change, avoid conflict, or be overly accommodating.</li>
+                <li><strong>Motivated by:</strong> Security, appreciation, harmony, clear procedures.</li>
+            </ul>
+
+            <h3><strong style="color: #428BCA;">C</strong> - Conscientiousness</h3>
+            <p>High 'C' individuals are analytical, precise, systematic, and quality-focused. They prioritize accuracy, maintain high standards, and rely on logic and data.</p>
+            <ul>
+                <li><strong>Strengths:</strong> Planning, organization, quality control, critical thinking.</li>
+                <li><strong>Challenges:</strong> Can be perfectionistic, overly critical, or slow to decide.</li>
+                <li><strong>Motivated by:</strong> Accuracy, logic, standards, detailed information.</li>
+            </ul>
+
+            <h2>Significance of DISC in Life</h2>
+            <p>Understanding DISC goes beyond just identifying your type. It provides valuable insights into:</p>
+            <ul>
+                <li><strong>Communication:</strong> Adapt your communication style to connect more effectively with others. For example, be direct and concise with high 'D's, enthusiastic and friendly with high 'I's, patient and supportive with high 'S's, and detailed and logical with high 'C's.</li>
+                <li><strong>Teamwork:</strong> Recognize how different styles contribute to a team's success and potential friction points. Build balanced teams that leverage diverse strengths.</li>
+                <li><strong>Leadership:</strong> Tailor your leadership approach to motivate and manage individuals based on their DISC profile.</li>
+                <li><strong>Conflict Resolution:</strong> Understand the root causes of conflict stemming from different behavioral styles and approach resolution more constructively.</li>
+                <li><strong>Personal Growth:</strong> Identify your natural strengths and potential blind spots. Develop strategies to manage challenges associated with your style and become more adaptable.</li>
+                <li><strong>Relationships:</strong> Improve understanding and reduce misunderstandings in personal relationships by appreciating different behavioral needs and preferences.</li>
+            </ul>
+
+            <h2>Putting DISC into Practice</h2>
+            <p>The key is not to label people, but to use DISC as a framework for understanding and adapting. Observe behaviors, listen actively, and adjust your approach to build stronger connections and achieve better outcomes, both personally and professionally.</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>Contact us at <a href="mailto:info@discpersonality.com">info@discpersonality.com</a></p>
+        <p>&copy; 2025 DISC Personality. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Basic script to ensure user is logged in
+        const username = localStorage.getItem("username");
+        if (!username) {
+            alert("You are not logged in. Redirecting to login page...");
+            window.location.href = "/";
+        }
+    </script>
+</body>
+</html>
