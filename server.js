@@ -57,6 +57,20 @@ db.serialize(() => {
     `);
 });
 
+// Create the chat_history table if it doesn't exist
+db.serialize(() => {
+    db.run(`
+        CREATE TABLE IF NOT EXISTS chat_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            sender TEXT,
+            message TEXT,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+});
+
+
 // Handle login requests
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
@@ -361,6 +375,20 @@ async function callGeminiAI(prompt) {
     }
 }
 
+// Function to save a chat message
+function saveChatMessage(username, sender, message) {
+    db.run(
+        'INSERT INTO chat_history (username, sender, message) VALUES (?, ?, ?)',
+        [username, sender, message],
+        (err) => {
+            if (err) {
+                console.error('Failed to save chat message:', err);
+            }
+        }
+    );
+}
+
+
 // API endpoint to process chat queries
 app.post("/api/chat", async (req, res) => {
     const { username, query } = req.body;
@@ -368,6 +396,9 @@ app.post("/api/chat", async (req, res) => {
     if (!username || !query) {
         return res.status(400).json({ error: "Username and query are required" });
     }
+    // Save user's query
+    saveChatMessage(username, 'user', query);
+
 
     // Fetch the DISC score for the user
     db.get('SELECT score FROM personality_test_progress WHERE username = ?', [username], async (err, row) => {
@@ -398,6 +429,9 @@ app.post("/api/chat", async (req, res) => {
 
         try {
             const response = await callGeminiAI(prompt);
+            // Save AI's response
+            saveChatMessage(username, 'ai', response);
+
             res.json({ reply: response });
         } catch (error) {
             console.error("Error occurred while processing the chat query:", error);
@@ -405,6 +439,94 @@ app.post("/api/chat", async (req, res) => {
         }
     });
 });
+
+// API endpoint for profile insights
+app.get('/api/profile-insights', async (req, res) => {
+    const { username } = req.query;
+
+    if (!username) {
+        return res.status(400).json({ error: 'Username is required' });
+    }
+
+    db.get('SELECT score FROM personality_test_progress WHERE username = ?', [username], async (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to fetch DISC score' });
+        }
+
+        if (!row || !row.score) {
+            return res.status(404).json({ error: 'DISC score not found. Please complete the personality test.' });
+        }
+
+        const discScore = row.score;
+        const prompt = `
+        You are 'Aura,' a compassionate and insightful AI behavioral coach specializing in the DISC personality model. Your goal is to empower the user with a deep understanding of themselves so they can thrive in their personal and professional lives.
+        
+        The user's DISC profile is:
+        - Dominance (D): ${discScore.split('D')[0]}%
+        - Influence (I): ${discScore.split('D')[1].split('I')[0]}%
+        - Steadiness (S): ${discScore.split('I')[1].split('S')[0]}%
+        - Conscientiousness (C): ${discScore.split('S')[1].split('C')[0]}%
+        
+        Please generate a comprehensive and inspiring personality report for the user. Structure the report with the following sections, using clear headings and an encouraging tone. Use markdown for emphasis (bolding, italics) where appropriate.
+        
+        ---
+        
+        ### 🌟 Your DISC Personality Snapshot
+        Provide a warm and insightful summary of the user's core personality. Highlight their most prominent traits and what makes their behavioral style unique.
+        
+        ### 🚀 Your Superpowers: Key Strengths
+        List and describe their most significant strengths. Frame these as "superpowers" they can leverage. For example, instead of just "Leadership," you might say "**Decisive Leadership:** You have a natural ability to take charge and steer projects toward success."
+        
+        ### 🌱 Opportunities for Growth: Potential Challenges
+        Gently outline potential challenges or blind spots associated with their profile. Frame these as opportunities for growth and provide constructive, actionable advice on how to navigate them.
+        
+        ### 💬 How You Connect: Communication Style
+        Describe their natural communication style. Provide practical tips for them to communicate more effectively and advice on how others can best communicate with them to build stronger connections.
+        
+        ### 🏢 Thriving in Your Element: Ideal Work Environment
+        Describe the characteristics of a work environment where they would feel most energized, engaged, and effective.
+        
+        ### 💼 Career Pathways to Explore
+        Based on their unique profile, suggest 3-5 specific career paths or job roles that would be a great fit and explain why.
+        
+        ### 💖 Nurturing Relationships
+        Briefly explain how their personality style might show up in personal relationships. Offer a small piece of advice for building and maintaining harmonious connections with others.
+        
+        ---
+        
+        Conclude the report with a positive and empowering closing statement. Include the headings in the report. 
+        `;
+
+        try {
+            const analysis = await callGeminiAI(prompt);
+            res.json({ analysis });
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to generate profile analysis' });
+        }
+    });
+});
+
+// Serve the saved chats page
+app.get('/saved-chats', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Dashboard', 'saved_chats.html'));
+});
+
+// API to fetch chat history
+app.get('/api/chat-history', (req, res) => {
+    const { username } = req.query;
+    if (!username) {
+        return res.status(400).json({ error: 'Username is required' });
+    }
+
+    db.all('SELECT sender, message, timestamp FROM chat_history WHERE username = ? ORDER BY timestamp ASC', [username], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: 'Failed to fetch chat history' });
+        } else {
+            res.json(rows);
+        }
+    });
+});
+
 
 // Start the server
 const PORT = process.env.PORT || 3000;

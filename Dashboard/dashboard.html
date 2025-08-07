@@ -103,8 +103,8 @@
             <div class="tile-container">
                 <a href="/Dashboard/personality_test.html" class="tile">Take Personality Test</a>
                 <a href="/Dashboard/chatbox.html" class="tile">Personal AI Assistance</a>
-                <div class="tile disabled">Saved Chats</div>
-                <div class="tile disabled">Profile</div>
+                <a href="/saved-chats" class="tile">Saved Chats</a>
+                <a href="/Dashboard/profile.html" id="profile-tile" class="tile disabled">Profile</a>
                 <a href="/Dashboard/know_more.html" class="tile">Know More</a>
                 <div class="tile disabled">Social</div>
             </div>
@@ -134,7 +134,14 @@
                     return response.json();
                 })
                 .then(data => {
-                    document.getElementById('user-score').textContent = data.score || 'No Score';
+                    const score = data.score || 'No Score';
+                    document.getElementById('user-score').textContent = score;
+
+                    // Enable or disable the profile tile based on the score
+                    const profileTile = document.getElementById('profile-tile');
+                    if (score !== 'No Score') {
+                        profileTile.classList.remove('disabled');
+                    }
                 })
                 .catch((error) => {
                     console.error('Error fetching score:', error);

@@ -1,0 +1,53 @@
+1. Introduction
+1.1 Purpose
+1.2 Scope
+1.3 Definitions, Acronyms, and Abbreviations
+1.4 Overview
+
+2. System Requirements
+2.1 Functional Requirements
+2.2 Non-Functional Requirements
+2.3 Performance Requirements
+2.4 Logical Database Requirements
+2.5 Software System Attributes
+2.5.1 Reliability
+2.5.2 Availability
+2.5.3 Security
+2.5.4 Maintainability
+2.5.5 Portability
+
+3. Software Specification
+
+4. System Design
+4.1 Architecture
+4.2 Use Case Diagram
+4.3 Class Diagram
+4.4 Sequence Diagram
+
+5. Project Structure and Code
+
+6. User Interface
+6.1 Login Screen
+6.2 Landing Page-Normal User
+6.3 Landing Page-Admin User
+6.4 Configuration Page
+6.5 Analytics Dashboards
+6.5.1 Dashboard - "IP Density Map"
+6.5.2 Dashboard - "Message Classification"
+6.5.3 Dashboard - "Anomaly Detection"
+6.6 Upload Page
+6.7 Error Page
+
+7. System Testing
+
+8. Ethical and Societal Effect
+
+9. Conclusion(s)
+
+10. Bibliography
+
+11. Appendices
+Appendix-A: Test Cases
+Appendix-B: Tables and Figures
+
+Sources and related content

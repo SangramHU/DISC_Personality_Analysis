@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Chats</title>
+    <link rel="stylesheet" href="../Style/style.css">
+    <style>
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        main { flex: 1; padding: 20px; }
+        .history-container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .chat-entry {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .chat-entry p { margin: 0; }
+        .chat-entry .sender-user { font-weight: bold; color: #005f5f; }
+        .chat-entry .sender-ai { font-weight: bold; color: #D9534F; }
+        .chat-entry .timestamp { font-size: 0.8rem; color: #777; margin-bottom: 5px; }
+        .logout-btn-header {
+            margin-left: auto; padding: 8px 16px; background-color: #dc3545; color: white;
+            border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;
+        }
+        .breadcrumb {
+            width: 100%; padding: 10px 20px; font-size: 0.9rem;
+            text-align: left; background-color: #f8f9fa;
+        }
+        .breadcrumb a { color: #008080; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">DISC Personality Analysis</div>
+            <button class="logout-btn-header" onclick="localStorage.clear(); window.location.href = '/';">Logout</button>
+        </nav>
+    </header>
+    <div class="breadcrumb">
+        <a href="/Dashboard/dashboard.html">Dashboard</a> > <span>Saved Chats</span>
+    </div>
+    <main>
+        <div class="history-container">
+            <h1 style="text-align: center;">Your Chat History</h1>
+            <div id="chat-history-content">
+                <p>Loading your chat history...</p>
+            </div>
+        </div>
+    </main>
+    <footer class="footer">
+        <p>Contact us at <a href="mailto:info@discpersonality.com">info@discpersonality.com</a></p>
+        <p>&copy; 2025 DISC Personality. All rights reserved.</p>
+    </footer>
+    <script>
+        const username = localStorage.getItem("username");
+        if (!username) {
+            alert("You are not logged in. Redirecting to login page...");
+            window.location.href = "/";
+        } else {
+            fetch(`/api/chat-history?username=${username}`)
+                .then(response => response.json())
+                .then(history => {
+                    const contentDiv = document.getElementById('chat-history-content');
+                    if (history.length === 0) {
+                        contentDiv.innerHTML = '<p>No chat history found.</p>';
+                        return;
+                    }
+                    contentDiv.innerHTML = ''; // Clear loading message
+                    history.forEach(entry => {
+                        const entryDiv = document.createElement('div');
+                        entryDiv.classList.add('chat-entry');
+                        const formattedTimestamp = new Date(entry.timestamp).toLocaleString();
+                        const senderClass = entry.sender === 'user' ? 'sender-user' : 'sender-ai';
+                        const senderName = entry.sender === 'user' ? 'You' : 'AI';
+
+                        entryDiv.innerHTML = `
+                            <div class="timestamp">${formattedTimestamp}</div>
+                            <p><span class="${senderClass}">${senderName}:</span> ${entry.message}</p>
+                        `;
+                        contentDiv.appendChild(entryDiv);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching chat history:", error);
+                    document.getElementById('chat-history-content').innerText = "Failed to load chat history.";
+                });
+        }
+    </script>
+</body>
+</html>
